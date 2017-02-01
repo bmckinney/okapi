@@ -27,4 +27,5 @@ if ! git ls-files $DCH --error-unmatch >/dev/null 2>&1; then
     echo '' >>$DCH
 fi
 
+dpkg-checkbuilddeps
 dpkg-buildpackage -rfakeroot -b
