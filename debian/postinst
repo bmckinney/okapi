@@ -1,0 +1,75 @@
+#!/bin/bash -e
+#
+# This script is executed in the post-installation phase
+#
+#   On Debian,
+#       $1=configure : is set to 'configure' and if $2 is set, it is an upgrade
+#
+
+# Sets the default values for okapi variables used in this script
+OKAPI_USER="okapi"
+OKAPI_GROUP="okapi"
+DATA_DIR="/var/lib/okapi"
+CONF_DIR="/etc/folio/okapi"
+LOG_DIR="/var/log/folio/okapi"
+
+
+# Source the default env file
+OKAPI_ENV_FILE="/etc/default/okapi"
+if [ -f "$OKAPI_ENV_FILE" ]; then
+    . "$OKAPI_ENV_FILE"
+fi
+
+IS_UPGRADE=false
+
+case "$1" in
+
+    configure)
+        # If $1=configure and $2 is set, this is an upgrade
+        if [ "$2" ]; then
+            IS_UPGRADE=true
+        fi
+    ;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "post install script called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac
+
+
+chown -R $OKAPI_USER:$OKAPI_GROUP $DATA_DIR
+mkdir -p "$LOG_DIR"
+chown -R $OKAPI_USER:$OKAPI_GROUP $LOG_DIR
+chown -R root:$OKAPI_GROUP $CONF_DIR
+chmod 0755 $CONF_DIR
+
+
+if [ "$IS_UPGRADE" != "true" ]; then
+    # initial installation.  configure systemd and start okapi
+    echo -n "Starting okapi service..."
+    if command -v systemctl >/dev/null; then
+        systemctl enable okapi.service
+        systemctl daemon-reload
+        systemctl start okapi.service || true
+    fi
+
+elif [ "$RESTART_ON_UPGRADE" = "true" ]; then
+    # okapi upgrade and RESTART_ON_UPGRADE="true"
+    echo -n "Restarting okapi service..."
+    if command -v systemctl >/dev/null; then
+        systemctl daemon-reload
+        systemctl restart okapi.service || true
+    fi
+else 
+    # okapi upgrade and RESTART_ON_UPGRADE is false or not set.
+    echo "Okapi upgraded but not restarted. To restart Okapi:"
+    echo "   sudo systemctl daemon-reload"
+    echo "   sudo systemctl restart okapi.service" 
+    echo ""
+fi
+
+exit 0
+
