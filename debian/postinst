@@ -92,8 +92,9 @@ if [ "$IS_UPGRADE" != "true" ]; then
         systemctl enable okapi.service
         systemctl daemon-reload
         if [ "$DB_INIT" = "true" ]; then 
-           echo "Starting Okapi"       
+           echo -n "Starting Okapi..."       
            systemctl start okapi.service || true
+           echo " OK"
         else 
            echo "Unable to initialize Postgres DB for Okapi."  
            echo "To initialize database run:"
@@ -106,10 +107,11 @@ if [ "$IS_UPGRADE" != "true" ]; then
 
 elif [ "$RESTART_ON_UPGRADE" = "true" ]; then
     # okapi upgrade and RESTART_ON_UPGRADE="true"
-    echo "Restarting okapi service..."
+    echo -n "Restarting okapi service..."
     if command -v systemctl >/dev/null; then
         systemctl daemon-reload
         systemctl restart okapi.service || true
+        echo " OK"
     fi
 else 
     # okapi upgrade and RESTART_ON_UPGRADE is false or not set.
