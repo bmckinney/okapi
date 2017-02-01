@@ -19,7 +19,7 @@ DCH=debian/changelog
 
 if ! git ls-files $DCH --error-unmatch >/dev/null 2>&1; then
     rm -f $DCH
-    echo "$NAME \(${VERSION}-1\) unstable; urgency=medium" >$DCH
+    echo "$NAME (${VERSION}-1) unstable; urgency=medium" >$DCH
     echo '' >>$DCH
     echo '  * Upstream.' >>$DCH
     echo '' >>$DCH
