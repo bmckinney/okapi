@@ -9,3 +9,11 @@ nbproject/
 .project
 .settings/
 .classpath
+build-stamp
+install-stamp
+debian/changelog
+debian/files
+debian/okapi.debhelper.log
+debian/okapi.substvars
+debian/okapi/
+
