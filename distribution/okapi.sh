@@ -139,7 +139,7 @@ EOF
          exit 2
       else
          echo -n "Initializing okapi database..."
-         $JAVA -Dport=8600 -Dstorage=postgres -Dpostgres_host=${postgres_host} -Dpostgres_port=${postgres_port} -Dpostgres_user=${postgres_user} -Dpostgres_password=${postgres_password} -Dpostgres_database=${postgres_database} -jar ${OKAPI_JAR} initdatabase
+         $JAVA -Dport=8600 -Dstorage=postgres -Dpostgres_host=${postgres_host} -Dpostgres_port=${postgres_port} -Dpostgres_user=${postgres_user} -Dpostgres_password=${postgres_password} -Dpostgres_database=${postgres_database} -jar ${OKAPI_JAR} initdatabase >/dev/null 2>&1
          INIT_RETVAL=$?
          if [ "$INIT_RETVAL" != 0 ]; then
             echo "Failed"
