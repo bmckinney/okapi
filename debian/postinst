@@ -30,21 +30,8 @@ else
     exit 2 
 fi
 
-# set storage according to okapi.conf; otherwise set to 'inmemory'
-STORAGE="${storage:-inmemory}"
-
-if [ "$STORAGE" = "postgres" ]; then
-   PG_HOST="-Dpostgres_host=${postgres_host:-localhost}"
-   PG_PORT="-Dpostgres_port=${postgres_port:-5432}"
-   PG_USER="-Dpostgres_user=${postgres_user:-okapi}"
-   PG_PASS="-Dpostgres_password=${postgres_password:-okapi25}"
-   PG_DB="-Dpostgres_database=${postgres_database:-okapi}"
-   PG_OPTS="-Dstorage=postgres $PG_HOST $PG_PORT $PG_USER $PG_PASS $PG_DB"
-fi
-
 
 IS_UPGRADE=false
-DB_INIT=true
 
 case "$1" in
 
@@ -72,37 +59,14 @@ chmod 0755 $CONF_DIR
 
 
 if [ "$IS_UPGRADE" != "true" ]; then
-    if [ "$STORAGE" = "postgres" ]; then
-       echo -n "Initializing postgres DB..."
-       /usr/bin/java -Dport=8600 $PG_OPTS -jar ${LIB_DIR}/okapi-core-fat.jar initdatabase > /dev/null 2>&1
-       retval=$?
-       if [ $retval -eq 0 ]; then 
-          echo " OK"
-       else
-          echo " Unable to initialize Postgres DB for Okapi."  
-          echo "To initialize database run:"
-          echo "java -Dport=8600 -Dstorage=postgres -jar ${LIB_DIR}/okapi-core-fat.jar initdatabase"
-          DB_INIT=false
-       fi
-    fi
-        
     # initial installation.  configure systemd and start okapi
     if command -v systemctl >/dev/null; then
         echo "Configuring Okapi service..."
         systemctl enable okapi.service
         systemctl daemon-reload
-        if [ "$DB_INIT" = "true" ]; then 
-           echo -n "Starting Okapi..."       
-           systemctl start okapi.service || true
-           echo " OK"
-        else 
-           echo "Unable to initialize Postgres DB for Okapi."  
-           echo "To initialize database run:"
-           echo "   java -Dport=8600 -Dstorage=postgres -jar ${LIB_DIR}/okapi-core-fat.jar initdatabase"
-           echo "and start Okapi:"
-           echo "    systemctl start okapi.service"
-           echo ""
-        fi
+        echo -n "Starting Okapi..."       
+        systemctl start okapi.service || true
+        echo " OK"
     fi
 
 elif [ "$RESTART_ON_UPGRADE" = "true" ]; then

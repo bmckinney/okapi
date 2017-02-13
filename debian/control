@@ -11,7 +11,8 @@ Homepage: https://github.com/folio-org/okapi
 Package: okapi
 Architecture: all
 Depends: openjdk-8-jdk | openjdk-8-jre, 
-         adduser 
+         adduser,
+         postgresql-client-common
 Description:  Multitenant API gateway for FOLIO
  Okapi is an implementation of some different patterns commonly 
  used within the microservice architecture. The most central of 

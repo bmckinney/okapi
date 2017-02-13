@@ -11,7 +11,7 @@ OKAPIROOT = $(CURDIR)/debian/$(OKAPIPACKAGE)
 OKAPIDOC  = $(OKAPIROOT)/usr/share/doc/$(OKAPIPACKAGE)
 OKAPICONF = $(OKAPIROOT)/etc/folio/okapi
 OKAPIHOME = $(OKAPIROOT)/usr/share/folio/okapi
-OKAPISYSD = $(OKAPIROOT)/usr/lib/systemd/system
+OKAPISYSD = $(OKAPIROOT)/lib/systemd/system
 
 # okapi fat jars
 OKAPICORE   = $(CURDIR)/okapi-core/target/okapi-core-fat.jar

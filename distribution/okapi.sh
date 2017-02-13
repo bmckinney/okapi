@@ -100,6 +100,7 @@ parse_okapi_conf()  {
 }   # end parse_okapi_conf
 
 
+
 # Look for Java and check version
 java_check() {
    if [ -n "$JAVA_HOME" -a -x "$JAVA_HOME/bin/java" ]; then
@@ -122,8 +123,48 @@ java_check() {
    fi
 }  # end java_check
 
+# initialize the Okapi database
+init_db() {
+   # Postgres instance check
+   if command -v psql >/dev/null; then
+      psql postgresql://${postgres_user}:${postgres_password}@${postgres_host}:${postgres_port}/${postgres_database}?connect_timeout=5 > /dev/null 2>&1 << EOF 
+\q
+EOF
+      POSTGRES_RETVAL=$?
+      if [ "$POSTGRES_RETVAL" != 0 ]; then
+         echo "Postgres check failed.  Verify that the Postgres instance"
+         echo "configured in okapi.conf is available and the okapi database"
+         echo "and user has been configured. Then re-run:"
+         echo "    /usr/share/folio/okapi/bin/okapi.sh --initdb"
+         exit 2
+      else
+         echo -n "Initializing okapi database..."
+         $JAVA -Dport=8600 -Dstorage=postgres -Dpostgres_host=${postgres_host} -Dpostgres_port=${postgres_port} -Dpostgres_user=${postgres_user} -Dpostgres_password=${postgres_password} -Dpostgres_database=${postgres_database} -jar ${OKAPI_JAR} initdatabase
+         INIT_RETVAL=$?
+         if [ "$INIT_RETVAL" != 0 ]; then
+            echo "Failed"
+            exit 2
+         else
+            echo "OK"
+            exit  
+         fi
+      fi
+    
+   else
+      echo "Postgres client not installed.  Unable to test connectivity to"
+      echo "postgres instance. Please manually verify connectivity and init"
+      echo "okapi database manually."
+      exit 2
+   fi
+}  # end init_db   
+
 # Set 'java'
 java_check
+
+if [ "$1" = "--initdb" ] && [ "$storage" = "postgres" ]; then
+   init_db
+fi
+
 
 # start Okapi as daemon 
 cd $DATA_DIR
