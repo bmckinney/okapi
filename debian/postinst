@@ -51,10 +51,9 @@ case "$1" in
 esac
 
 
-chown -R $OKAPI_USER:$OKAPI_GROUP $DATA_DIR
 mkdir -p "$LOG_DIR"
-chown -R $OKAPI_USER:$OKAPI_GROUP $LOG_DIR
-chown -R root:$OKAPI_GROUP $CONF_DIR
+chown -R ${OKAPI_USER}.${OKAPI_GROUP} $LOG_DIR
+chown -R root.${OKAPI_GROUP} $CONF_DIR
 chmod 0755 $CONF_DIR
 
 
